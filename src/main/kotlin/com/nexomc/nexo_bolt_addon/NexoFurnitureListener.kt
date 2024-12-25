@@ -29,8 +29,9 @@ class NexoFurnitureListener : Listener {
         isCancelled = true
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun NexoFurnitureBreakEvent.onBreak() {
+        if (boltPlugin.player(player).action != null) return
         bolt.removeProtection(bolt.findProtection(baseEntity) ?: return)
     }
 
