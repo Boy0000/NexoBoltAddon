@@ -16,22 +16,25 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.EquipmentSlot
 import org.popcraft.bolt.event.LockBlockEvent
 import org.popcraft.bolt.util.Action
+import org.popcraft.bolt.util.Permission
 
 class NexoFurnitureListener : Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     fun NexoFurnitureInteractEvent.onInteract() {
-        if (useFurniture == Event.Result.DENY) return
         if (boltPlugin.player(player).action != null) return
         if (!bolt.isProtectedExact(baseEntity)) return
-        if (bolt.canAccess(baseEntity, player, "private")) return
+        if (useFurniture == Event.Result.DENY || bolt.canAccess(baseEntity, player, Permission.INTERACT)) return
+        if (mechanic.hasSeats() && bolt.canAccess(baseEntity, player, Permission.MOUNT)) return
+        if (mechanic.isStorage() && bolt.canAccess(baseEntity, player, Permission.OPEN)) return
 
-        isCancelled = true
+        useFurniture = Event.Result.DENY
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun NexoFurnitureBreakEvent.onBreak() {
         if (boltPlugin.player(player).action != null) return
+        if (!bolt.canAccess(baseEntity, player, Permission.DESTROY)) return
         bolt.removeProtection(bolt.findProtection(baseEntity) ?: return)
     }
 
